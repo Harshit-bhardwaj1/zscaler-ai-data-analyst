@@ -14,7 +14,8 @@ import {
 
 import "./App.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 const exampleQuestions = [
   "Which customer has the highest churn risk?",
@@ -73,8 +74,6 @@ function App() {
 
     try {
       /*
-       * IMPORTANT:
-       *
        * The backend needs the previous assistant result, including:
        * - answer
        * - evidence
@@ -355,7 +354,11 @@ function Message({ message }) {
       <div className="message-content">
         <div className="message-author">AI Analyst</div>
 
-        <div className={`answer ${message.error ? "error-answer" : ""}`}>
+        <div
+          className={`answer ${
+            message.error ? "error-answer" : ""
+          }`}
+        >
           {message.content}
         </div>
 
@@ -387,7 +390,9 @@ function Evidence({ data }) {
 
                 <div>
                   <strong>
-                    {step.step || step.name || `Step ${index + 1}`}
+                    {step.step ||
+                      step.name ||
+                      `Step ${index + 1}`}
                   </strong>
 
                   {step.status && (
@@ -402,73 +407,82 @@ function Evidence({ data }) {
         </div>
       )}
 
-      {data.tables_used && data.tables_used.length > 0 && (
-        <div className="evidence-card">
-          <div className="evidence-title">
-            <Database size={15} />
-            Tables used
+      {data.tables_used &&
+        data.tables_used.length > 0 && (
+          <div className="evidence-card">
+            <div className="evidence-title">
+              <Database size={15} />
+              Tables used
+            </div>
+
+            <div className="chips">
+              {data.tables_used.map((table) => (
+                <span
+                  className="chip"
+                  key={table}
+                >
+                  {table}
+                </span>
+              ))}
+            </div>
           </div>
+        )}
 
-          <div className="chips">
-            {data.tables_used.map((table) => (
-              <span
-                className="chip"
-                key={table}
-              >
-                {table}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {data.evidence &&
+        data.evidence.length > 0 && (
+          <div className="evidence-card">
+            <div className="evidence-title">
+              <Table2 size={15} />
+              Evidence
+            </div>
 
-      {data.evidence && data.evidence.length > 0 && (
-        <div className="evidence-card">
-          <div className="evidence-title">
-            <Table2 size={15} />
-            Evidence
-          </div>
-
-          <div className="evidence-table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  {Object.keys(data.evidence[0]).map((key) => (
-                    <th key={key}>{key}</th>
-                  ))}
-                </tr>
-              </thead>
-
-              <tbody>
-                {data.evidence.map((row, index) => (
-                  <tr key={index}>
-                    {Object.keys(data.evidence[0]).map((key) => (
-                      <td key={key}>
-                        {String(row[key] ?? "-")}
-                      </td>
-                    ))}
+            <div className="evidence-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    {Object.keys(data.evidence[0]).map(
+                      (key) => (
+                        <th key={key}>{key}</th>
+                      )
+                    )}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+                </thead>
 
-      {data.assumptions && data.assumptions.length > 0 && (
-        <div className="evidence-card assumptions">
-          <div className="evidence-title">
-            <span>⚠</span>
-            Assumptions
+                <tbody>
+                  {data.evidence.map((row, index) => (
+                    <tr key={index}>
+                      {Object.keys(
+                        data.evidence[0]
+                      ).map((key) => (
+                        <td key={key}>
+                          {String(row[key] ?? "-")}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+        )}
 
-          <ul>
-            {data.assumptions.map((assumption, index) => (
-              <li key={index}>{assumption}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {data.assumptions &&
+        data.assumptions.length > 0 && (
+          <div className="evidence-card assumptions">
+            <div className="evidence-title">
+              <span>⚠</span>
+              Assumptions
+            </div>
+
+            <ul>
+              {data.assumptions.map(
+                (assumption, index) => (
+                  <li key={index}>{assumption}</li>
+                )
+              )}
+            </ul>
+          </div>
+        )}
     </div>
   );
 }
