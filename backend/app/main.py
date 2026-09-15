@@ -2,49 +2,70 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import Base, engine
-from app import models
-
-from app.routes.tables import router as tables_router
 from app.routes.chat import router as chat_router
-from app.routes.conversations import router as conversations_router
 
 
 app = FastAPI(
-    title="Zscaler AI Data Analyst",
-    description="AI-powered multi-table business data analyst",
+    title="AI Data Analyst",
+    description="Zscaler AI Product Builder Assessment Prototype",
     version="1.0.0",
 )
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],
+    allow_origins=[
+        settings.FRONTEND_URL,
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-@app.on_event("startup")
-def startup():
-    Base.metadata.create_all(bind=engine)
-
-
-app.include_router(tables_router)
 app.include_router(chat_router)
-app.include_router(conversations_router)
 
 
 @app.get("/")
 def root():
     return {
-        "message": "Zscaler AI Data Analyst API is running"
+        "message": "AI Data Analyst API is running",
+        "status": "healthy",
     }
 
 
 @app.get("/health")
 def health():
     return {
-        "status": "healthy"
+        "status": "healthy",
+    }
+
+
+@app.get("/api/tables")
+def get_tables():
+    return {
+        "tables": [
+            {
+                "name": "customers",
+                "description": "Customer accounts and segmentation.",
+            },
+            {
+                "name": "subscriptions",
+                "description": "Subscription plans and MRR.",
+            },
+            {
+                "name": "usage",
+                "description": "Product usage and adoption metrics.",
+            },
+            {
+                "name": "support_tickets",
+                "description": "Customer support activity.",
+            },
+            {
+                "name": "revenue_events",
+                "description": "New, expansion, contraction and churn events.",
+            },
+        ]
     }

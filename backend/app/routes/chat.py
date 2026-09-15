@@ -1,7 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException
 
-from app.database import get_db
 from app.schemas import ChatRequest
 from app.services.agent import analyze_question
 
@@ -13,15 +11,16 @@ router = APIRouter(
 
 
 @router.post("")
-def chat(
-    request: ChatRequest,
-    db: Session = Depends(get_db),
-):
+def chat(request: ChatRequest):
     try:
         result = analyze_question(
             question=request.question,
-            db=db,
-            conversation_history=getattr(request, "conversation_history", None),
+            db=None,
+            conversation_history=getattr(
+                request,
+                "conversation_history",
+                None,
+            ),
         )
 
         return {
